@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Gastos</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #242424;
+    --border: #2e2e2e;
+    --text: #f0f0f0;
+    --muted: #888;
+    --accent: #c8f135;
+    --casa: #60a5fa;
+    --comida: #f97316;
+    --movilidad: #a78bfa;
+    --andre: #f472b6;
+    --sin: #6b7280;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    min-height: 100vh;
+    padding: 0 0 40px 0;
+  }
+
+  /* Header */
+  .header {
+    padding: 56px 20px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 4px;
+  }
+  .label {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  .ciclo-badge {
+    font-size: 11px;
+    color: var(--accent);
+    background: rgba(200,241,53,0.1);
+    border: 1px solid rgba(200,241,53,0.2);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  .total-grande {
+    font-size: 52px;
+    font-weight: 700;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin: 8px 0 4px;
+    color: var(--text);
+  }
+  .total-grande span {
+    font-size: 24px;
+    font-weight: 400;
+    color: var(--muted);
+    letter-spacing: 0;
+  }
+  .mitad-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .mitad-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .mitad-chip strong {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* Secciones */
+  .section {
+    padding: 24px 20px 0;
+  }
+  .section-title {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+    margin-bottom: 14px;
+  }
+
+  /* Cards de categoría */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .cat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+  .cat-card.CASA::before { background: var(--casa); }
+  .cat-card.COMIDA::before { background: var(--comida); }
+  .cat-card.MOVILIDAD::before { background: var(--movilidad); }
+  .cat-card.ANDRE::before { background: var(--andre); }
+  .cat-card.default::before { background: var(--sin); }
+
+  .cat-name {
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .cat-monto {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+  .cat-monto .sym {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--muted);
+  }
+  .cat-bar-bg {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 10px;
+    overflow: hidden;
+  }
+  .cat-bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.6s ease;
+  }
+  .CASA .cat-bar { background: var(--casa); }
+  .COMIDA .cat-bar { background: var(--comida); }
+  .MOVILIDAD .cat-bar { background: var(--movilidad); }
+  .ANDRE .cat-bar { background: var(--andre); }
+  .default .cat-bar { background: var(--sin); }
+
+  .cat-pct {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 5px;
+  }
+
+  /* Lista de gastos */
+  .gastos-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .gasto-item {
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    padding: 14px 16px;
+    gap: 12px;
+  }
+  .gasto-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .gasto-dot.CASA { background: var(--casa); }
+  .gasto-dot.COMIDA { background: var(--comida); }
+  .gasto-dot.MOVILIDAD { background: var(--movilidad); }
+  .gasto-dot.ANDRE { background: var(--andre); }
+  .gasto-dot.default { background: var(--sin); }
+
+  .gasto-info { flex: 1; min-width: 0; }
+  .gasto-concepto {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text);
+  }
+  .gasto-meta {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .gasto-monto {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+
+  /* Loading / error */
+  .estado {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    gap: 12px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .spinner {
+    width: 28px; height: 28px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .btn-reload {
+    margin: 20px auto 0;
+    display: block;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 24px;
+    border-radius: 20px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .empty-cat {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 30px;
+    color: var(--muted);
+    font-size: 13px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+</style>
+</head>
+<body>
+
+<!-- REEMPLAZA ESTA URL CON LA TUYA -->
+<script>
+  const API_URL = "https://script.google.com/macros/s/AKfycbxA6t9aK90QF9h_LmaJphcULyE9yeNnqZl1vVyAVknUOwE_HfytxosJGY5XRQ0up8IX/exec";
+</script>
+
+<div id="app">
+  <div class="estado">
+    <div class="spinner"></div>
+    <span>Cargando gastos...</span>
+  </div>
+</div>
+
+<script>
+function colorDot(cat) {
+  const valid = ['CASA','COMIDA','MOVILIDAD','ANDRE'];
+  return valid.includes(cat) ? cat : 'default';
+}
+
+function render(data) {
+  const { ciclo, total, mitad, por_categoria, gastos } = data;
+  const totalMax = Math.max(...Object.values(por_categoria), 1);
+
+  const catCards = Object.keys(por_categoria).length === 0
+    ? `<div class="empty-cat">Sin gastos en este ciclo</div>`
+    : Object.entries(por_categoria)
+        .sort((a,b) => b[1] - a[1])
+        .map(([cat, monto]) => {
+          const pct = Math.round((monto / total) * 100);
+          const barW = Math.round((monto / totalMax) * 100);
+          const cls = colorDot(cat);
+          return `
+            <div class="cat-card ${cls}">
+              <div class="cat-name">${cat}</div>
+              <div class="cat-monto"><span class="sym">S/ </span>${monto.toFixed(2)}</div>
+              <div class="cat-bar-bg"><div class="cat-bar" style="width:${barW}%"></div></div>
+              <div class="cat-pct">${pct}% del total</div>
+            </div>`;
+        }).join('');
+
+  const gastosList = gastos.length === 0
+    ? `<div class="gasto-item"><div class="gasto-info"><div class="gasto-concepto" style="color:var(--muted)">Sin gastos en este ciclo</div></div></div>`
+    : gastos.map(g => {
+        const cls = colorDot(g.categoria);
+        return `
+          <div class="gasto-item">
+            <div class="gasto-dot ${cls}"></div>
+            <div class="gasto-info">
+              <div class="gasto-concepto">${g.concepto || '—'}</div>
+              <div class="gasto-meta">${g.fecha} · ${g.categoria || 'Sin categoría'}</div>
+            </div>
+            <div class="gasto-monto">S/ ${Number(g.monto).toFixed(2)}</div>
+          </div>`;
+      }).join('');
+
+  document.getElementById('app').innerHTML = `
+    <div class="header">
+      <div class="header-top">
+        <div class="label">Ciclo actual</div>
+        <div class="ciclo-badge">${ciclo.inicio} → ${ciclo.cierre}</div>
+      </div>
+      <div class="total-grande"><span>S/ </span>${total.toFixed(2)}</div>
+      <div class="mitad-row">
+        <div class="mitad-chip">Tu parte (50%): <strong>S/ ${mitad.toFixed(2)}</strong></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Por categoría</div>
+      <div class="cat-grid">${catCards}</div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Todos los gastos</div>
+      <div class="gastos-list">${gastosList}</div>
+    </div>
+
+    <button class="btn-reload" onclick="cargar()">↻ Actualizar</button>
+  `;
+}
+
+async function cargar() {
+  document.getElementById('app').innerHTML = `
+    <div class="estado">
+      <div class="spinner"></div>
+      <span>Cargando gastos...</span>
+    </div>`;
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    render(data);
+  } catch(err) {
+    document.getElementById('app').innerHTML = `
+      <div class="estado">
+        <span>⚠️ No se pudo conectar</span>
+        <span style="font-size:12px">Verifica que la URL esté correcta</span>
+        <button class="btn-reload" onclick="cargar()">Reintentar</button>
+      </div>`;
+  }
+}
+
+cargar();
+</script>
+</body>
+</html>
