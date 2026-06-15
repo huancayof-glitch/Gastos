@@ -8,31 +8,27 @@
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
   :root {
-    --bg: #0a0e27;
+    --bg: #0a0d1f;
     --surface: #141829;
-    --surface2: #1f2638;
-    --border: #2d3748;
-    --text: #f7fafc;
-    --muted: #a0aec0;
-    --accent: #c8f135;
+    --text: #ffffff;
+    --muted: #9ca3af;
+    --accent: #a3e635;
     
-    --casa: #3b82f6;
-    --comida: #f97316;
-    --movilidad: #a78bfa;
-    --andre: #ec4899;
-    --sin: #6b7280;
+    --casa: #f97316;
+    --casa-dark: #ea580c;
+    --comida: #eab308;
+    --comida-dark: #ca8a04;
+    --movilidad: #a855f7;
+    --movilidad-dark: #9333ea;
+    --andre: #3b82f6;
+    --andre-dark: #2563eb;
     
-    --casa-light: rgba(59, 130, 246, 0.1);
-    --comida-light: rgba(249, 115, 22, 0.1);
-    --movilidad-light: rgba(167, 139, 250, 0.1);
-    --andre-light: rgba(236, 72, 153, 0.1);
-    
-    --radius: 20px;
-    --radius-sm: 12px;
+    --radius: 24px;
+    --radius-sm: 16px;
   }
 
   body {
-    background: linear-gradient(135deg, var(--bg) 0%, #0f1438 100%);
+    background: #000000;
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
     min-height: 100vh;
@@ -41,10 +37,11 @@
 
   /* Header */
   .header {
-    padding: 56px 20px 20px;
-    border-bottom: 1px solid var(--border);
-    background: linear-gradient(180deg, rgba(10,14,39,0.8) 0%, rgba(10,14,39,0.4) 100%);
-    backdrop-filter: blur(10px);
+    padding: 16px 20px 20px;
+    position: relative;
+    padding-top: max(16px, env(safe-area-inset-top));
+    background: #000000;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
   }
 
   .header-top {
@@ -52,68 +49,65 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
+    gap: 12px;
   }
 
   .label {
-    font-size: 11px;
-    letter-spacing: 0.1em;
+    font-size: 10px;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--muted);
-    font-weight: 600;
+    font-weight: 700;
+    flex: 1;
   }
 
   .ciclo-selector {
     appearance: none;
-    background: var(--surface2);
-    border: 1px solid var(--border);
+    background: rgba(200,241,53,0.08);
+    border: 1px solid rgba(200,241,53,0.3);
     color: var(--accent);
-    padding: 6px 12px 6px 8px;
+    padding: 8px 12px;
     border-radius: 12px;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c8f135' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 6px center;
-    background-size: 16px;
-    padding-right: 28px;
+    flex-shrink: 0;
   }
 
   .ciclo-selector:focus {
     outline: none;
     border-color: var(--accent);
-    box-shadow: 0 0 0 2px rgba(200, 241, 53, 0.1);
+    background: rgba(200,241,53,0.12);
   }
 
   .total-grande {
-    font-size: 56px;
-    font-weight: 800;
-    letter-spacing: -1.5px;
+    font-size: 64px;
+    font-weight: 900;
+    letter-spacing: -2px;
     line-height: 1;
-    margin: 8px 0 2px;
-    color: var(--text);
-    background: linear-gradient(135deg, var(--text) 0%, var(--muted) 100%);
+    margin: 0 0 4px;
+    background: linear-gradient(135deg, var(--accent) 0%, #84cc16 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
   .total-grande span {
-    font-size: 24px;
-    font-weight: 600;
+    font-size: 28px;
+    font-weight: 700;
     -webkit-text-fill-color: var(--muted);
   }
 
   .mitad-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-top: 14px;
+    gap: 8px;
+    margin-top: 12px;
   }
 
   .mitad-chip {
-    background: linear-gradient(135deg, rgba(200,241,53,0.15) 0%, rgba(200,241,53,0.05) 100%);
-    border: 1px solid rgba(200,241,53,0.3);
+    background: rgba(200,241,53,0.08);
+    border: 1px solid rgba(200,241,53,0.25);
     border-radius: 12px;
     padding: 8px 14px;
     font-size: 13px;
@@ -133,12 +127,12 @@
   }
 
   .section-title {
-    font-size: 12px;
-    letter-spacing: 0.1em;
+    font-size: 11px;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--muted);
     font-weight: 700;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
 
   /* Cards de categoría */
@@ -150,70 +144,105 @@
   }
 
   .cat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: var(--radius-sm);
-    padding: 18px;
+    padding: 16px;
     position: relative;
     overflow: hidden;
     transition: all 0.3s ease;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
   .cat-card:active {
-    transform: scale(0.98);
+    transform: scale(0.96);
+  }
+
+  .cat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.08;
+    pointer-events: none;
   }
 
   .cat-card.CASA {
-    background: linear-gradient(135deg, var(--casa-light) 0%, transparent 100%);
-    border-color: rgba(59, 130, 246, 0.3);
+    border-color: rgba(249, 115, 22, 0.3);
+    box-shadow: inset 0 1px 0 rgba(249, 115, 22, 0.1);
+  }
+
+  .cat-card.CASA::before {
+    background: linear-gradient(135deg, var(--casa) 0%, transparent 100%);
   }
 
   .cat-card.COMIDA {
-    background: linear-gradient(135deg, var(--comida-light) 0%, transparent 100%);
-    border-color: rgba(249, 115, 22, 0.3);
+    border-color: rgba(234, 179, 8, 0.3);
+    box-shadow: inset 0 1px 0 rgba(234, 179, 8, 0.1);
+  }
+
+  .cat-card.COMIDA::before {
+    background: linear-gradient(135deg, var(--comida) 0%, transparent 100%);
   }
 
   .cat-card.MOVILIDAD {
-    background: linear-gradient(135deg, var(--movilidad-light) 0%, transparent 100%);
-    border-color: rgba(167, 139, 250, 0.3);
+    border-color: rgba(168, 85, 247, 0.3);
+    box-shadow: inset 0 1px 0 rgba(168, 85, 247, 0.1);
+  }
+
+  .cat-card.MOVILIDAD::before {
+    background: linear-gradient(135deg, var(--movilidad) 0%, transparent 100%);
   }
 
   .cat-card.ANDRE {
-    background: linear-gradient(135deg, var(--andre-light) 0%, transparent 100%);
-    border-color: rgba(236, 72, 153, 0.3);
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: inset 0 1px 0 rgba(59, 130, 246, 0.1);
   }
 
-  .cat-card.default {
-    background: linear-gradient(135deg, rgba(107,114,128,0.1) 0%, transparent 100%);
-    border-color: rgba(107,114,128,0.3);
+  .cat-card.ANDRE::before {
+    background: linear-gradient(135deg, var(--andre) 0%, transparent 100%);
   }
 
   .cat-header {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 1;
   }
 
   .cat-emoji {
-    font-size: 24px;
+    font-size: 28px;
     line-height: 1;
   }
 
   .cat-name {
-    font-size: 11px;
+    font-size: 10px;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--muted);
     font-weight: 700;
+    text-align: right;
+  }
+
+  .cat-content {
+    position: relative;
+    z-index: 1;
   }
 
   .cat-monto {
-    font-size: 24px;
+    font-size: 26px;
     font-weight: 800;
     letter-spacing: -0.5px;
     color: var(--text);
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+    line-height: 1.1;
   }
 
   .cat-monto .sym {
@@ -222,28 +251,8 @@
     color: var(--muted);
   }
 
-  .cat-bar-bg {
-    height: 4px;
-    background: var(--surface2);
-    border-radius: 2px;
-    overflow: hidden;
-    margin-bottom: 8px;
-  }
-
-  .cat-bar {
-    height: 100%;
-    border-radius: 2px;
-    transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  .CASA .cat-bar { background: linear-gradient(90deg, var(--casa) 0%, rgba(59,130,246,0.6) 100%); }
-  .COMIDA .cat-bar { background: linear-gradient(90deg, var(--comida) 0%, rgba(249,115,22,0.6) 100%); }
-  .MOVILIDAD .cat-bar { background: linear-gradient(90deg, var(--movilidad) 0%, rgba(167,139,250,0.6) 100%); }
-  .ANDRE .cat-bar { background: linear-gradient(90deg, var(--andre) 0%, rgba(236,72,153,0.6) 100%); }
-  .default .cat-bar { background: linear-gradient(90deg, var(--sin) 0%, rgba(107,114,128,0.6) 100%); }
-
   .cat-pct {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--muted);
     font-weight: 600;
   }
@@ -253,20 +262,20 @@
     display: flex;
     flex-direction: column;
     gap: 0;
-    background: var(--surface);
+    background: rgba(255,255,255,0.03);
     border-radius: var(--radius-sm);
     overflow: hidden;
-    border: 1px solid var(--border);
+    border: 1px solid rgba(255,255,255,0.08);
     margin-bottom: 24px;
+    backdrop-filter: blur(10px);
   }
 
   .gasto-item {
-    background: var(--surface);
     display: flex;
     align-items: center;
-    padding: 16px 18px;
+    padding: 14px 16px;
     gap: 12px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
     transition: background 0.2s ease;
   }
 
@@ -275,22 +284,21 @@
   }
 
   .gasto-item:active {
-    background: var(--surface2);
+    background: rgba(255,255,255,0.05);
   }
 
   .gasto-dot {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
     flex-shrink: 0;
-    box-shadow: 0 0 8px currentColor;
   }
 
-  .gasto-dot.CASA { background: var(--casa); color: var(--casa); }
-  .gasto-dot.COMIDA { background: var(--comida); color: var(--comida); }
-  .gasto-dot.MOVILIDAD { background: var(--movilidad); color: var(--movilidad); }
-  .gasto-dot.ANDRE { background: var(--andre); color: var(--andre); }
-  .gasto-dot.default { background: var(--sin); color: var(--sin); }
+  .gasto-dot.CASA { background: var(--casa); }
+  .gasto-dot.COMIDA { background: var(--comida); }
+  .gasto-dot.MOVILIDAD { background: var(--movilidad); }
+  .gasto-dot.ANDRE { background: var(--andre); }
+  .gasto-dot.default { background: var(--muted); }
 
   .gasto-info {
     flex: 1;
@@ -298,7 +306,7 @@
   }
 
   .gasto-concepto {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -307,13 +315,13 @@
   }
 
   .gasto-meta {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--muted);
-    margin-top: 4px;
+    margin-top: 3px;
   }
 
   .gasto-monto {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
     color: var(--text);
     flex-shrink: 0;
@@ -334,7 +342,7 @@
   .spinner {
     width: 32px;
     height: 32px;
-    border: 3px solid var(--border);
+    border: 3px solid rgba(255,255,255,0.1);
     border-top-color: var(--accent);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -347,12 +355,12 @@
   .btn-reload {
     margin: 20px auto 0;
     display: block;
-    background: linear-gradient(135deg, var(--accent) 0%, #b8e724 100%);
+    background: linear-gradient(135deg, var(--accent) 0%, #84cc16 100%);
     border: none;
-    color: #0a0e27;
+    color: #000;
     padding: 12px 28px;
     border-radius: 12px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     cursor: pointer;
     letter-spacing: 0.05em;
@@ -369,8 +377,8 @@
     padding: 40px 20px;
     color: var(--muted);
     font-size: 14px;
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
     border-radius: var(--radius-sm);
   }
 
@@ -424,14 +432,13 @@ function render(data) {
         ).join('')}
       </select>`;
 
-  // Cards de categoría
+  // Cards de categoría - ordenar por monto descendente
   const catCards = Object.keys(por_categoria).length === 0
     ? `<div class="empty-cat">📊 Sin gastos en este ciclo</div>`
     : Object.entries(por_categoria)
         .sort((a,b) => b[1] - a[1])
         .map(([cat, monto]) => {
           const pct = Math.round((monto / total) * 100);
-          const barW = Math.round((monto / totalMax) * 100);
           const cls = colorDot(cat);
           const emoji = getEmojiPorCategoria(cat);
           return `
@@ -440,9 +447,10 @@ function render(data) {
                 <div class="cat-emoji">${emoji}</div>
                 <div class="cat-name">${cat}</div>
               </div>
-              <div class="cat-monto"><span class="sym">S/ </span>${monto.toFixed(2)}</div>
-              <div class="cat-bar-bg"><div class="cat-bar" style="width:${barW}%"></div></div>
-              <div class="cat-pct">${pct}% del total</div>
+              <div class="cat-content">
+                <div class="cat-monto"><span class="sym">S/ </span>${monto.toFixed(2)}</div>
+                <div class="cat-pct">${pct}% del total</div>
+              </div>
             </div>`;
         }).join('');
 
@@ -465,7 +473,7 @@ function render(data) {
   document.getElementById('app').innerHTML = `
     <div class="header">
       <div class="header-top">
-        <div class="label">Ciclo</div>
+        <div class="label">Ciclo Actual</div>
         ${selectorCiclos}
       </div>
       <div class="total-grande"><span>S/ </span>${total.toFixed(2)}</div>
