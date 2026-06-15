@@ -3,31 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Gastos</title>
+<title>Gastos Compartidos</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
   :root {
-    --bg: #0f0f0f;
-    --surface: #1a1a1a;
-    --surface2: #242424;
-    --border: #2e2e2e;
-    --text: #f0f0f0;
-    --muted: #888;
+    --bg: #0a0e27;
+    --surface: #141829;
+    --surface2: #1f2638;
+    --border: #2d3748;
+    --text: #f7fafc;
+    --muted: #a0aec0;
     --accent: #c8f135;
-    --casa: #60a5fa;
+    
+    --casa: #3b82f6;
     --comida: #f97316;
     --movilidad: #a78bfa;
-    --andre: #f472b6;
+    --andre: #ec4899;
     --sin: #6b7280;
-    --radius: 16px;
-    --radius-sm: 10px;
+    
+    --casa-light: rgba(59, 130, 246, 0.1);
+    --comida-light: rgba(249, 115, 22, 0.1);
+    --movilidad-light: rgba(167, 139, 250, 0.1);
+    --andre-light: rgba(236, 72, 153, 0.1);
+    
+    --radius: 20px;
+    --radius-sm: 12px;
   }
 
   body {
-    background: var(--bg);
+    background: linear-gradient(135deg, var(--bg) 0%, #0f1438 100%);
     color: var(--text);
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', sans-serif;
     min-height: 100vh;
     padding: 0 0 40px 0;
   }
@@ -36,191 +43,278 @@
   .header {
     padding: 56px 20px 20px;
     border-bottom: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(10,14,39,0.8) 0%, rgba(10,14,39,0.4) 100%);
+    backdrop-filter: blur(10px);
   }
+
   .header-top {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 4px;
+    align-items: center;
+    margin-bottom: 16px;
   }
+
   .label {
     font-size: 11px;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--muted);
-    font-weight: 500;
+    font-weight: 600;
   }
-  .ciclo-badge {
-    font-size: 11px;
+
+  .ciclo-selector {
+    appearance: none;
+    background: var(--surface2);
+    border: 1px solid var(--border);
     color: var(--accent);
-    background: rgba(200,241,53,0.1);
-    border: 1px solid rgba(200,241,53,0.2);
-    padding: 4px 10px;
-    border-radius: 20px;
-    font-weight: 500;
+    padding: 6px 12px 6px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23c8f135' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+    background-size: 16px;
+    padding-right: 28px;
   }
+
+  .ciclo-selector:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(200, 241, 53, 0.1);
+  }
+
   .total-grande {
-    font-size: 52px;
-    font-weight: 700;
-    letter-spacing: -2px;
+    font-size: 56px;
+    font-weight: 800;
+    letter-spacing: -1.5px;
     line-height: 1;
-    margin: 8px 0 4px;
+    margin: 8px 0 2px;
     color: var(--text);
+    background: linear-gradient(135deg, var(--text) 0%, var(--muted) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
+
   .total-grande span {
     font-size: 24px;
-    font-weight: 400;
-    color: var(--muted);
-    letter-spacing: 0;
+    font-weight: 600;
+    -webkit-text-fill-color: var(--muted);
   }
+
   .mitad-row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-top: 10px;
+    gap: 12px;
+    margin-top: 14px;
   }
+
   .mitad-chip {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 6px 14px;
+    background: linear-gradient(135deg, rgba(200,241,53,0.15) 0%, rgba(200,241,53,0.05) 100%);
+    border: 1px solid rgba(200,241,53,0.3);
+    border-radius: 12px;
+    padding: 8px 14px;
     font-size: 13px;
     color: var(--muted);
+    font-weight: 500;
   }
+
   .mitad-chip strong {
     color: var(--accent);
-    font-weight: 600;
+    font-weight: 700;
+    font-size: 14px;
   }
 
   /* Secciones */
   .section {
-    padding: 24px 20px 0;
+    padding: 28px 20px 0;
   }
+
   .section-title {
-    font-size: 11px;
-    letter-spacing: 0.08em;
+    font-size: 12px;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     color: var(--muted);
-    font-weight: 500;
-    margin-bottom: 14px;
+    font-weight: 700;
+    margin-bottom: 16px;
   }
 
   /* Cards de categoría */
   .cat-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    gap: 12px;
+    margin-bottom: 24px;
   }
+
   .cat-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 16px;
+    border-radius: var(--radius-sm);
+    padding: 18px;
     position: relative;
     overflow: hidden;
+    transition: all 0.3s ease;
   }
-  .cat-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    border-radius: var(--radius) var(--radius) 0 0;
+
+  .cat-card:active {
+    transform: scale(0.98);
   }
-  .cat-card.CASA::before { background: var(--casa); }
-  .cat-card.COMIDA::before { background: var(--comida); }
-  .cat-card.MOVILIDAD::before { background: var(--movilidad); }
-  .cat-card.ANDRE::before { background: var(--andre); }
-  .cat-card.default::before { background: var(--sin); }
+
+  .cat-card.CASA {
+    background: linear-gradient(135deg, var(--casa-light) 0%, transparent 100%);
+    border-color: rgba(59, 130, 246, 0.3);
+  }
+
+  .cat-card.COMIDA {
+    background: linear-gradient(135deg, var(--comida-light) 0%, transparent 100%);
+    border-color: rgba(249, 115, 22, 0.3);
+  }
+
+  .cat-card.MOVILIDAD {
+    background: linear-gradient(135deg, var(--movilidad-light) 0%, transparent 100%);
+    border-color: rgba(167, 139, 250, 0.3);
+  }
+
+  .cat-card.ANDRE {
+    background: linear-gradient(135deg, var(--andre-light) 0%, transparent 100%);
+    border-color: rgba(236, 72, 153, 0.3);
+  }
+
+  .cat-card.default {
+    background: linear-gradient(135deg, rgba(107,114,128,0.1) 0%, transparent 100%);
+    border-color: rgba(107,114,128,0.3);
+  }
+
+  .cat-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .cat-emoji {
+    font-size: 24px;
+    line-height: 1;
+  }
 
   .cat-name {
-    font-size: 10px;
-    letter-spacing: 0.06em;
+    font-size: 11px;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 6px;
-    font-weight: 500;
-  }
-  .cat-monto {
-    font-size: 22px;
     font-weight: 700;
+  }
+
+  .cat-monto {
+    font-size: 24px;
+    font-weight: 800;
     letter-spacing: -0.5px;
     color: var(--text);
+    margin-bottom: 10px;
   }
+
   .cat-monto .sym {
-    font-size: 13px;
-    font-weight: 400;
+    font-size: 14px;
+    font-weight: 600;
     color: var(--muted);
   }
+
   .cat-bar-bg {
-    height: 3px;
-    background: var(--border);
+    height: 4px;
+    background: var(--surface2);
     border-radius: 2px;
-    margin-top: 10px;
     overflow: hidden;
+    margin-bottom: 8px;
   }
+
   .cat-bar {
     height: 100%;
     border-radius: 2px;
-    transition: width 0.6s ease;
+    transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .CASA .cat-bar { background: var(--casa); }
-  .COMIDA .cat-bar { background: var(--comida); }
-  .MOVILIDAD .cat-bar { background: var(--movilidad); }
-  .ANDRE .cat-bar { background: var(--andre); }
-  .default .cat-bar { background: var(--sin); }
+
+  .CASA .cat-bar { background: linear-gradient(90deg, var(--casa) 0%, rgba(59,130,246,0.6) 100%); }
+  .COMIDA .cat-bar { background: linear-gradient(90deg, var(--comida) 0%, rgba(249,115,22,0.6) 100%); }
+  .MOVILIDAD .cat-bar { background: linear-gradient(90deg, var(--movilidad) 0%, rgba(167,139,250,0.6) 100%); }
+  .ANDRE .cat-bar { background: linear-gradient(90deg, var(--andre) 0%, rgba(236,72,153,0.6) 100%); }
+  .default .cat-bar { background: linear-gradient(90deg, var(--sin) 0%, rgba(107,114,128,0.6) 100%); }
 
   .cat-pct {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--muted);
-    margin-top: 5px;
+    font-weight: 600;
   }
 
   /* Lista de gastos */
   .gastos-list {
     display: flex;
     flex-direction: column;
-    gap: 1px;
-    background: var(--border);
-    border-radius: var(--radius);
+    gap: 0;
+    background: var(--surface);
+    border-radius: var(--radius-sm);
     overflow: hidden;
     border: 1px solid var(--border);
+    margin-bottom: 24px;
   }
+
   .gasto-item {
     background: var(--surface);
     display: flex;
     align-items: center;
-    padding: 14px 16px;
+    padding: 16px 18px;
     gap: 12px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.2s ease;
   }
+
+  .gasto-item:last-child {
+    border-bottom: none;
+  }
+
+  .gasto-item:active {
+    background: var(--surface2);
+  }
+
   .gasto-dot {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
     flex-shrink: 0;
+    box-shadow: 0 0 8px currentColor;
   }
-  .gasto-dot.CASA { background: var(--casa); }
-  .gasto-dot.COMIDA { background: var(--comida); }
-  .gasto-dot.MOVILIDAD { background: var(--movilidad); }
-  .gasto-dot.ANDRE { background: var(--andre); }
-  .gasto-dot.default { background: var(--sin); }
 
-  .gasto-info { flex: 1; min-width: 0; }
+  .gasto-dot.CASA { background: var(--casa); color: var(--casa); }
+  .gasto-dot.COMIDA { background: var(--comida); color: var(--comida); }
+  .gasto-dot.MOVILIDAD { background: var(--movilidad); color: var(--movilidad); }
+  .gasto-dot.ANDRE { background: var(--andre); color: var(--andre); }
+  .gasto-dot.default { background: var(--sin); color: var(--sin); }
+
+  .gasto-info {
+    flex: 1;
+    min-width: 0;
+  }
+
   .gasto-concepto {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 15px;
+    font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     color: var(--text);
   }
+
   .gasto-meta {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--muted);
-    margin-top: 2px;
+    margin-top: 4px;
   }
+
   .gasto-monto {
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text);
     flex-shrink: 0;
   }
@@ -236,44 +330,62 @@
     color: var(--muted);
     font-size: 14px;
   }
+
   .spinner {
-    width: 28px; height: 28px;
-    border: 2px solid var(--border);
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--border);
     border-top-color: var(--accent);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
-  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
 
   .btn-reload {
     margin: 20px auto 0;
     display: block;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 10px 24px;
-    border-radius: 20px;
-    font-size: 13px;
+    background: linear-gradient(135deg, var(--accent) 0%, #b8e724 100%);
+    border: none;
+    color: #0a0e27;
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 700;
     cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: transform 0.2s ease;
+  }
+
+  .btn-reload:active {
+    transform: scale(0.96);
   }
 
   .empty-cat {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 30px;
+    padding: 40px 20px;
     color: var(--muted);
-    font-size: 13px;
+    font-size: 14px;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: var(--radius);
+    border-radius: var(--radius-sm);
+  }
+
+  .empty-list {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
   }
 </style>
 </head>
 <body>
 
-<!-- REEMPLAZA ESTA URL CON LA TUYA -->
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbxA6t9aK90QF9h_LmaJphcULyE9yeNnqZl1vVyAVknUOwE_HfytxosJGY5XRQ0up8IX/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbxMp9n_na_SIWh9TsQsFMgNLorgib5vRBMbVJuriYkF1jhcfujwViDH1nl0qVzgA_np/exec";
 </script>
 
 <div id="app">
@@ -284,34 +396,59 @@
 </div>
 
 <script>
+function getEmojiPorCategoria(cat) {
+  const emojis = {
+    'CASA': '🏠',
+    'COMIDA': '🍽️',
+    'MOVILIDAD': '🚕',
+    'ANDRE': '🛍️'
+  };
+  return emojis[cat] || '📌';
+}
+
 function colorDot(cat) {
   const valid = ['CASA','COMIDA','MOVILIDAD','ANDRE'];
   return valid.includes(cat) ? cat : 'default';
 }
 
 function render(data) {
-  const { ciclo, total, mitad, por_categoria, gastos } = data;
+  const { ciclo, ciclosDisponibles, total, mitad, por_categoria, gastos } = data;
   const totalMax = Math.max(...Object.values(por_categoria), 1);
 
+  // Selector de ciclos
+  const selectorCiclos = ciclosDisponibles.length === 0
+    ? ''
+    : `<select class="ciclo-selector" onchange="cambiarCiclo(this.value)">
+        ${ciclosDisponibles.map(c => 
+          `<option value="${c.inicio}">${c.inicio} → ${c.cierre}</option>`
+        ).join('')}
+      </select>`;
+
+  // Cards de categoría
   const catCards = Object.keys(por_categoria).length === 0
-    ? `<div class="empty-cat">Sin gastos en este ciclo</div>`
+    ? `<div class="empty-cat">📊 Sin gastos en este ciclo</div>`
     : Object.entries(por_categoria)
         .sort((a,b) => b[1] - a[1])
         .map(([cat, monto]) => {
           const pct = Math.round((monto / total) * 100);
           const barW = Math.round((monto / totalMax) * 100);
           const cls = colorDot(cat);
+          const emoji = getEmojiPorCategoria(cat);
           return `
             <div class="cat-card ${cls}">
-              <div class="cat-name">${cat}</div>
+              <div class="cat-header">
+                <div class="cat-emoji">${emoji}</div>
+                <div class="cat-name">${cat}</div>
+              </div>
               <div class="cat-monto"><span class="sym">S/ </span>${monto.toFixed(2)}</div>
               <div class="cat-bar-bg"><div class="cat-bar" style="width:${barW}%"></div></div>
               <div class="cat-pct">${pct}% del total</div>
             </div>`;
         }).join('');
 
+  // Lista de gastos
   const gastosList = gastos.length === 0
-    ? `<div class="gasto-item"><div class="gasto-info"><div class="gasto-concepto" style="color:var(--muted)">Sin gastos en este ciclo</div></div></div>`
+    ? `<div class="empty-list">📭 Sin gastos en este ciclo</div>`
     : gastos.map(g => {
         const cls = colorDot(g.categoria);
         return `
@@ -328,8 +465,8 @@ function render(data) {
   document.getElementById('app').innerHTML = `
     <div class="header">
       <div class="header-top">
-        <div class="label">Ciclo actual</div>
-        <div class="ciclo-badge">${ciclo.inicio} → ${ciclo.cierre}</div>
+        <div class="label">Ciclo</div>
+        ${selectorCiclos}
       </div>
       <div class="total-grande"><span>S/ </span>${total.toFixed(2)}</div>
       <div class="mitad-row">
@@ -338,17 +475,36 @@ function render(data) {
     </div>
 
     <div class="section">
-      <div class="section-title">Por categoría</div>
+      <div class="section-title">Por Categoría</div>
       <div class="cat-grid">${catCards}</div>
     </div>
 
     <div class="section">
-      <div class="section-title">Todos los gastos</div>
+      <div class="section-title">Últimos Gastos</div>
       <div class="gastos-list">${gastosList}</div>
     </div>
 
     <button class="btn-reload" onclick="cargar()">↻ Actualizar</button>
   `;
+}
+
+async function cambiarCiclo(cicloInicio) {
+  document.getElementById('app').innerHTML = `
+    <div class="estado">
+      <div class="spinner"></div>
+      <span>Cargando ciclo...</span>
+    </div>`;
+  try {
+    const res = await fetch(API_URL + '?ciclo=' + cicloInicio);
+    const data = await res.json();
+    render(data);
+  } catch(err) {
+    document.getElementById('app').innerHTML = `
+      <div class="estado">
+        <span>⚠️ No se pudo conectar</span>
+        <button class="btn-reload" onclick="cargar()">Reintentar</button>
+      </div>`;
+  }
 }
 
 async function cargar() {
@@ -375,3 +531,9 @@ cargar();
 </script>
 </body>
 </html>
+
+    
+
+
+
+     
