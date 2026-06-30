@@ -327,6 +327,114 @@
     flex-shrink: 0;
   }
 
+  /* Compras en cuotas */
+  .cuotas-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: rgba(255,255,255,0.03);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 24px;
+    backdrop-filter: blur(10px);
+  }
+
+  .cuota-item {
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.2s ease;
+  }
+
+  .cuota-item:last-child {
+    border-bottom: none;
+  }
+
+  .cuota-item:active {
+    background: rgba(255,255,255,0.05);
+  }
+
+  .cuota-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: space-between;
+  }
+
+  .cuota-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .cuota-emoji {
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  .cuota-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .cuota-concepto {
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text);
+  }
+
+  .cuota-meta {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .cuota-monto {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .cuota-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .cuota-bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .cuota-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent) 0%, #84cc16 100%);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+  }
+
+  .cuota-label {
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+    white-space: nowrap;
+    min-width: 40px;
+    text-align: right;
+  }
+
   /* Loading / error */
   .estado {
     display: flex;
@@ -393,7 +501,7 @@
 <body>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbxMp9n_na_SIWh9TsQsFMgNLorgib5vRBMbVJuriYkF1jhcfujwViDH1nl0qVzgA_np/exec";
+  const API_URL = "https://script.google.com/macros/s/AKfycbzu4t903fABrUbXMMFqVSHmIQpjWa5TA16M5EeqoOWqK7QvlGT73iZUVpNlxTmEjKRA/exec";
 </script>
 
 <div id="app">
@@ -422,6 +530,10 @@ function colorDot(cat) {
 function render(data) {
   const { ciclo, ciclosDisponibles, total, mitad, por_categoria, gastos } = data;
   const totalMax = Math.max(...Object.values(por_categoria), 1);
+
+  // Filtrar gastos normales y cuotas
+  const gastosNormales = gastos.filter(g => !g.es_cuota);
+  const gastosConCuota = gastos.filter(g => g.es_cuota);
 
   // Selector de ciclos
   const selectorCiclos = ciclosDisponibles.length === 0
@@ -454,10 +566,43 @@ function render(data) {
             </div>`;
         }).join('');
 
-  // Lista de gastos
-  const gastosList = gastos.length === 0
+  // Lista de compras en cuotas
+  const cuotasHtml = gastosConCuota.length === 0
+    ? ''
+    : `
+    <div class="section">
+      <div class="section-title">Compras en Cuotas</div>
+      <div class="cuotas-list">
+        ${gastosConCuota.map(c => {
+          const porcentajeProgress = (c.cuota_actual / c.cuota_total) * 100;
+          const emoji = getEmojiPorCategoria(c.categoria);
+          return `
+            <div class="cuota-item">
+              <div class="cuota-header">
+                <div class="cuota-left">
+                  <div class="cuota-emoji">${emoji}</div>
+                  <div class="cuota-info">
+                    <div class="cuota-concepto">${c.concepto || '—'}</div>
+                    <div class="cuota-meta">${c.fecha} · ${c.categoria || 'Sin categoría'}</div>
+                  </div>
+                </div>
+                <div class="cuota-monto">S/ ${Number(c.monto).toFixed(2)}</div>
+              </div>
+              <div class="cuota-progress">
+                <div class="cuota-bar">
+                  <div class="cuota-fill" style="width: ${porcentajeProgress}%"></div>
+                </div>
+                <div class="cuota-label">${c.cuota_actual}/${c.cuota_total}</div>
+              </div>
+            </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+
+  // Lista de gastos normales
+  const gastosList = gastosNormales.length === 0
     ? `<div class="empty-list">📭 Sin gastos en este ciclo</div>`
-    : gastos.map(g => {
+    : gastosNormales.map(g => {
         const cls = colorDot(g.categoria);
         return `
           <div class="gasto-item">
@@ -486,6 +631,8 @@ function render(data) {
       <div class="section-title">Por Categoría</div>
       <div class="cat-grid">${catCards}</div>
     </div>
+
+    ${cuotasHtml}
 
     <div class="section">
       <div class="section-title">Últimos Gastos</div>
