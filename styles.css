@@ -3,11 +3,11 @@
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 :root {
-  --bg: #0a0d1f;
-  --surface: #141829;
-  --text: #ffffff;
-  --muted: #9ca3af;
-  --accent: #ffffff;
+  --bg: #070a12;
+  --surface: #0f1724;
+  --text: #e6f0ff;
+  --muted: #9fb0c6;
+  --accent: #60a5fa;
   
   --casa: #f97316;
   --casa-dark: #ea580c;
@@ -23,7 +23,7 @@
 }
 
 body {
-  background: #000000;
+  background: #070a12;
   color: var(--text);
   font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   min-height: 100vh;
@@ -59,9 +59,9 @@ body {
 
 .ciclo-selector {
   appearance: none;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #ffffff;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(96,165,250,0.12);
+  color: var(--text);
   padding: 12px 16px;
   border-radius: 10px;
   font-size: 13px;
@@ -91,23 +91,23 @@ body {
 
 /* TOTAL - Mayor énfasis */
 .total-grande {
-  font-size: 76px;
-  font-weight: 900;
-  letter-spacing: -2px;
-  line-height: 0.9;
+  font-size: 48px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1;
   margin: 0 0 12px;
-  color: #ffffff;
+  color: #4ade80;
   font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  text-shadow: 0 0 60px rgba(255, 255, 255, 0.25), 0 0 30px rgba(255, 255, 255, 0.15);
-  padding: 16px 20px;
-  border-radius: 14px;
-  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  padding: 0;
+  border: none;
+  border-radius: 0;
   display: inline-block;
-  box-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
+  box-shadow: none;
+  text-shadow: none;
 }
 
 .total-grande span {
-  font-size: 32px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--muted);
   font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -121,8 +121,8 @@ body {
 }
 
 .mitad-chip {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  background: rgba(96,165,250,0.04);
+  border: 1px solid rgba(96,165,250,0.12);
   border-radius: 13px;
   padding: 14px 20px;
   font-size: 14px;
@@ -130,7 +130,7 @@ body {
   font-weight: 600;
   backdrop-filter: blur(10px);
   font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+  box-shadow: 0 6px 16px rgba(2,6,23,0.45);
 }
 
 .mitad-chip strong {
@@ -286,11 +286,22 @@ body {
   z-index: 1;
 }
 
+/* Montos por categoría usan el color del casillero; nombre y porcentaje en blanco */
+.cat-card .cat-name,
+.cat-card .cat-pct {
+  color: var(--text);
+}
+
+.cat-card.CASA .cat-monto { color: var(--casa); }
+.cat-card.COMIDA .cat-monto { color: var(--comida); }
+.cat-card.MOVILIDAD .cat-monto { color: var(--movilidad); }
+.cat-card.ANDRE .cat-monto { color: var(--andre); }
+
 .cat-monto {
   font-size: 32px;
   font-weight: 800;
   letter-spacing: -0.5px;
-  color: var(--text);
+  color: var(--accent);
   margin-bottom: 8px;
   line-height: 1.1;
   font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -380,7 +391,7 @@ body {
 .gasto-monto {
   font-size: 16px;
   font-weight: 700;
-  color: var(--text);
+  color: #ffffff;
   flex-shrink: 0;
   font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
@@ -476,23 +487,34 @@ body {
 
 .cuota-bar {
   flex: 1;
-  height: 8px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 4px;
+  height: 10px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 999px;
   overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .cuota-fill {
   height: 100%;
-  background: linear-gradient(90deg, #ffffff 0%, #e5e5e5 100%);
-  border-radius: 4px;
+  background: linear-gradient(90deg, #34d399 0%, #22c55e 50%, #4ade80 100%);
+  border-radius: inherit;
   transition: width 0.3s ease;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 14px rgba(74, 222, 128, 0.35);
+  position: relative;
+}
+
+.cuota-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.04) 100%);
+  pointer-events: none;
 }
 
 .cuota-label {
   font-size: 12px;
-  color: var(--muted);
+  color: #d1fae5;
   font-weight: 800;
   white-space: nowrap;
   min-width: 45px;
@@ -529,9 +551,9 @@ body {
 .btn-reload {
   margin: 24px auto 0;
   display: block;
-  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, #7dd3fc 100%);
   border: none;
-  color: #000000;
+  color: #041022;
   padding: 14px 32px;
   border-radius: 12px;
   font-size: 14px;
@@ -540,7 +562,7 @@ body {
   letter-spacing: 0.05em;
   transition: all 0.2s ease;
   font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 30px rgba(96,165,250,0.12);
 }
 
 .btn-reload:active {
