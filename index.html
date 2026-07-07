@@ -45,15 +45,31 @@ function formatearFechaCorta(fecha) {
   return texto;
 }
 
-function render(data) {
-  const { ciclo, ciclosDisponibles, total, mitad, por_categoria, gastos } = data;
+function mostrarEstado(mensaje, submensaje = '', mostrarSpinner = false, mostrarBoton = true) {
+  const app = document.getElementById('app');
+  if (!app) return;
+  app.innerHTML = `
+    <div class="estado ${submensaje ? 'estado-error' : ''}">
+      ${mostrarSpinner ? '<div class="spinner"></div>' : '<span class="estado-icon">⚠️</span>'}
+      <span>${mensaje}</span>
+      ${submensaje ? `<span class="estado-sub">${submensaje}</span>` : ''}
+      ${mostrarBoton ? '<button class="btn-reload" onclick="cargar()">Reintentar</button>' : ''}
+    </div>`;
+}
 
-  // Filtrar gastos normales y cuotas
+function render(data) {
+  const payload = data && typeof data === 'object' ? data : {};
+  const ciclo = payload.ciclo && typeof payload.ciclo === 'object' ? payload.ciclo : {};
+  const ciclosDisponibles = Array.isArray(payload.ciclosDisponibles) ? payload.ciclosDisponibles : [];
+  const total = Number(payload.total) || 0;
+  const mitad = Number(payload.mitad) || 0;
+  const porCategoria = payload.por_categoria && typeof payload.por_categoria === 'object' ? payload.por_categoria : {};
+  const gastos = Array.isArray(payload.gastos) ? payload.gastos : [];
+
   const gastosNormales = gastos.filter(g => !g.es_cuota);
   const gastosConCuota = gastos.filter(g => g.es_cuota);
 
-  // Selector de ciclos
-  const cicloActualTexto = formatearFechaCorta(ciclo?.inicio) && formatearFechaCorta(ciclo?.cierre)
+  const cicloActualTexto = formatearFechaCorta(ciclo.inicio) && formatearFechaCorta(ciclo.cierre)
     ? `${formatearFechaCorta(ciclo.inicio)} → ${formatearFechaCorta(ciclo.cierre)}`
     : '';
 
@@ -61,17 +77,16 @@ function render(data) {
     ? ''
     : `<select class="ciclo-selector" onchange="cambiarCiclo(this.value)">
         ${ciclosDisponibles.map(c => 
-          `<option value="${c.inicio}" ${c.inicio === ciclo?.inicio ? 'selected' : ''}>${formatearFechaCorta(c.inicio)} → ${formatearFechaCorta(c.cierre)}</option>`
+          `<option value="${c.inicio}" ${c.inicio === ciclo.inicio ? 'selected' : ''}>${formatearFechaCorta(c.inicio)} → ${formatearFechaCorta(c.cierre)}</option>`
         ).join('')}
       </select>`;
 
-  // Cards de categoría - ordenar por monto descendente
-  const catCards = Object.keys(por_categoria).length === 0
+  const catCards = Object.keys(porCategoria).length === 0
     ? `<div class="empty-cat">📊 No hay gastos registrados en este ciclo</div>`
-    : Object.entries(por_categoria)
+    : Object.entries(porCategoria)
         .sort((a,b) => b[1] - a[1])
         .map(([cat, monto]) => {
-          const pct = Math.round((monto / total) * 100);
+          const pct = total > 0 ? Math.round((monto / total) * 100) : 0;
           const cls = colorDot(cat);
           const emoji = getEmojiPorCategoria(cat);
           return `
@@ -81,13 +96,12 @@ function render(data) {
                 <div class="cat-name">${cat}</div>
               </div>
               <div class="cat-content">
-                <div class="cat-monto"><span class="sym">S/ </span>${monto.toFixed(2)}</div>
+                <div class="cat-monto"><span class="sym">S/ </span>${Number(monto || 0).toFixed(2)}</div>
                 <div class="cat-pct">${pct}% del total</div>
               </div>
             </div>`;
         }).join('');
 
-  // Lista de compras en cuotas
   const cuotasHtml = gastosConCuota.length === 0
     ? ''
     : `
@@ -95,7 +109,7 @@ function render(data) {
       <div class="section-title">Compras en Cuotas</div>
       <div class="cuotas-list">
         ${gastosConCuota.map(c => {
-          const porcentajeProgress = (c.cuota_actual / c.cuota_total) * 100;
+          const porcentajeProgress = Number(c.cuota_total) > 0 ? (Number(c.cuota_actual) / Number(c.cuota_total)) * 100 : 0;
           const emoji = getEmojiPorCategoria(c.categoria);
           return `
             <div class="cuota-item">
@@ -107,7 +121,7 @@ function render(data) {
                     <div class="cuota-meta">${c.fecha} · ${c.categoria || 'Sin categoría'}</div>
                   </div>
                 </div>
-                <div class="cuota-monto">S/ ${Number(c.monto).toFixed(2)}</div>
+                <div class="cuota-monto">S/ ${Number(c.monto || 0).toFixed(2)}</div>
               </div>
               <div class="cuota-progress">
                 <div class="cuota-bar">
@@ -120,7 +134,6 @@ function render(data) {
       </div>
     </div>`;
 
-  // Lista de gastos normales
   const gastosList = gastosNormales.length === 0
     ? `<div class="empty-list">📭 No hay gastos normales en este ciclo</div>`
     : gastosNormales.map(g => {
@@ -132,7 +145,7 @@ function render(data) {
               <div class="gasto-concepto">${g.concepto || '—'}</div>
               <div class="gasto-meta">${g.fecha} · ${g.categoria || 'Sin categoría'}</div>
             </div>
-            <div class="gasto-monto">S/ ${Number(g.monto).toFixed(2)}</div>
+            <div class="gasto-monto">S/ ${Number(g.monto || 0).toFixed(2)}</div>
           </div>`;
       }).join('');
 
@@ -143,9 +156,9 @@ function render(data) {
         <div class="ciclo-actual">${cicloActualTexto}</div>
         ${selectorCiclos}
       </div>
-      <div class="total-grande"><span>S/ </span>${total.toFixed(2)}</div>
+      <div class="total-grande"><span>S/ </span>${Number(total).toFixed(2)}</div>
       <div class="mitad-row">
-        <div class="mitad-chip">Tu parte (50%): <strong>S/ ${mitad.toFixed(2)}</strong></div>
+        <div class="mitad-chip">Tu parte (50%): <strong>S/ ${Number(mitad).toFixed(2)}</strong></div>
       </div>
     </div>
 
@@ -166,47 +179,34 @@ function render(data) {
 }
 
 async function cambiarCiclo(cicloInicio) {
-  document.getElementById('app').innerHTML = `
-    <div class="estado">
-      <div class="spinner"></div>
-      <span>Cargando ciclo...</span>
-    </div>`;
+  mostrarEstado('Cargando ciclo...', '', true, false);
   try {
-    const res = await fetch(API_URL + '?ciclo=' + cicloInicio);
+    const res = await fetch(`${API_URL}?ciclo=${encodeURIComponent(cicloInicio)}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     render(data);
-  } catch(err) {
-    document.getElementById('app').innerHTML = `
-      <div class="estado estado-error">
-        <span class="estado-icon">⚠️</span>
-        <span>No se pudo conectar</span>
-        <button class="btn-reload" onclick="cargar()">Reintentar</button>
-      </div>`;
+  } catch (err) {
+    mostrarEstado('No se pudo conectar', 'No fue posible cargar el ciclo seleccionado.', false, true);
   }
 }
 
 async function cargar() {
-  document.getElementById('app').innerHTML = `
-    <div class="estado">
-      <div class="spinner"></div>
-      <span>Cargando gastos...</span>
-    </div>`;
+  mostrarEstado('Cargando gastos...', '', true, false);
   try {
-    const res = await fetch(API_URL);
+    const res = await fetch(API_URL, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     render(data);
-  } catch(err) {
-    document.getElementById('app').innerHTML = `
-      <div class="estado estado-error">
-        <span class="estado-icon">⚠️</span>
-        <span>No se pudo conectar</span>
-        <span class="estado-sub">Verifica que la URL esté correcta</span>
-        <button class="btn-reload" onclick="cargar()">Reintentar</button>
-      </div>`;
+  } catch (err) {
+    mostrarEstado('No se pudo conectar', 'Verifica que la URL esté correcta o que la API responda.', false, true);
   }
 }
 
-cargar();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', cargar);
+} else {
+  cargar();
+}
 </script>
 </body>
 </html>

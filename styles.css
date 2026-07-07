@@ -609,3 +609,16 @@ body {
   font-size: 14px;
   font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
+
+.estado-error {
+  color: #fecaca;
+}
+
+.estado-icon {
+  font-size: 24px;
+}
+
+.estado-sub {
+  font-size: 13px;
+  color: var(--muted);
+}
