@@ -1,211 +1,610 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Gastos Compartidos</title>
-<link rel="stylesheet" href="./styles.css">
-</head>
-<body>
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=SF+Mono:wght@400;500;700&display=swap');
 
-<script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbzeApW6uwK3pw0GOE_TQjr-Lcn2i5NjSdHZz3TMHSm04iwIwm8xa6D8YhdITmGh3-NB/exec";
-</script>
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-<div id="app">
-  <div class="estado">
-    <div class="spinner"></div>
-    <span>Cargando gastos...</span>
-  </div>
-</div>
-
-<script>
-function getEmojiPorCategoria(cat) {
-  const emojis = {
-    'CASA': '🏠',
-    'COMIDA': '🍽️',
-    'MOVILIDAD': '🚕',
-    'ANDRE': '🛍️'
-  };
-  return emojis[cat] || '📌';
+:root {
+  --bg: #070a12;
+  --surface: #0f1724;
+  --text: #e6f0ff;
+  --muted: #9fb0c6;
+  --accent: #60a5fa;
+  
+  --casa: #f97316;
+  --casa-dark: #ea580c;
+  --comida: #eab308;
+  --comida-dark: #ca8a04;
+  --movilidad: #a855f7;
+  --movilidad-dark: #9333ea;
+  --andre: #3b82f6;
+  --andre-dark: #2563eb;
+  
+  --radius: 24px;
+  --radius-sm: 16px;
 }
 
-function colorDot(cat) {
-  const valid = ['CASA','COMIDA','MOVILIDAD','ANDRE'];
-  return valid.includes(cat) ? cat : 'default';
+body {
+  background: #070a12;
+  color: var(--text);
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  padding: 0 0 32px 0;
+  -webkit-font-smoothing: antialiased;
 }
 
-function formatearFechaCorta(fecha) {
-  if (!fecha) return '';
-  const texto = String(fecha);
-  const match = texto.match(/(\d{4})-(\d{2})-(\d{2})/);
-  if (match) {
-    return `${match[3]}/${match[2]}/${match[1].slice(-2)}`;
-  }
-  return texto;
+/* Header */
+.header {
+  padding: 16px 16px 24px;
+  position: relative;
+  padding-top: max(16px, env(safe-area-inset-top));
+  background: #070a12;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
 }
 
-function render(data) {
-  const { ciclo, ciclosDisponibles, total, mitad, por_categoria, gastos } = data;
-  const totalMax = Math.max(...Object.values(por_categoria), 1);
-
-  // Filtrar gastos normales y cuotas
-  const gastosNormales = gastos.filter(g => !g.es_cuota);
-  const gastosConCuota = gastos.filter(g => g.es_cuota);
-
-  // Selector de ciclos
-  const cicloActualTexto = formatearFechaCorta(ciclo?.inicio) && formatearFechaCorta(ciclo?.cierre)
-    ? `${formatearFechaCorta(ciclo.inicio)} → ${formatearFechaCorta(ciclo.cierre)}`
-    : '';
-
-  const selectorCiclos = ciclosDisponibles.length === 0
-    ? ''
-    : `<select class="ciclo-selector" onchange="cambiarCiclo(this.value)">
-        ${ciclosDisponibles.map(c => 
-          `<option value="${c.inicio}" ${c.inicio === ciclo?.inicio ? 'selected' : ''}>${formatearFechaCorta(c.inicio)} → ${formatearFechaCorta(c.cierre)}</option>`
-        ).join('')}
-      </select>`;
-
-  // Cards de categoría - ordenar por monto descendente
-  const catCards = Object.keys(por_categoria).length === 0
-    ? `<div class="empty-cat">📊 Sin gastos en este ciclo</div>`
-    : Object.entries(por_categoria)
-        .sort((a,b) => b[1] - a[1])
-        .map(([cat, monto]) => {
-          const pct = Math.round((monto / total) * 100);
-          const cls = colorDot(cat);
-          const emoji = getEmojiPorCategoria(cat);
-          return `
-            <div class="cat-card ${cls}">
-              <div class="cat-header">
-                <div class="cat-emoji">${emoji}</div>
-                <div class="cat-name">${cat}</div>
-              </div>
-              <div class="cat-content">
-                <div class="cat-monto"><span class="sym">S/ </span>${monto.toFixed(2)}</div>
-                <div class="cat-pct">${pct}% del total</div>
-              </div>
-            </div>`;
-        }).join('');
-
-  // Lista de compras en cuotas
-  const cuotasHtml = gastosConCuota.length === 0
-    ? ''
-    : `
-    <div class="section">
-      <div class="section-title">Compras en Cuotas</div>
-      <div class="cuotas-list">
-        ${gastosConCuota.map(c => {
-          const porcentajeProgress = (c.cuota_actual / c.cuota_total) * 100;
-          const emoji = getEmojiPorCategoria(c.categoria);
-          return `
-            <div class="cuota-item">
-              <div class="cuota-header">
-                <div class="cuota-left">
-                  <div class="cuota-emoji">${emoji}</div>
-                  <div class="cuota-info">
-                    <div class="cuota-concepto">${c.concepto || '—'}</div>
-                    <div class="cuota-meta">${c.fecha} · ${c.categoria || 'Sin categoría'}</div>
-                  </div>
-                </div>
-                <div class="cuota-monto">S/ ${Number(c.monto).toFixed(2)}</div>
-              </div>
-              <div class="cuota-progress">
-                <div class="cuota-bar">
-                  <div class="cuota-fill" style="width: ${porcentajeProgress}%"></div>
-                </div>
-                <div class="cuota-label">${c.cuota_actual}/${c.cuota_total}</div>
-              </div>
-            </div>`;
-        }).join('')}
-      </div>
-    </div>`;
-
-  // Lista de gastos normales
-  const gastosList = gastosNormales.length === 0
-    ? `<div class="empty-list">📭 Sin gastos en este ciclo</div>`
-    : gastosNormales.map(g => {
-        const cls = colorDot(g.categoria);
-        return `
-          <div class="gasto-item">
-            <div class="gasto-dot ${cls}"></div>
-            <div class="gasto-info">
-              <div class="gasto-concepto">${g.concepto || '—'}</div>
-              <div class="gasto-meta">${g.fecha} · ${g.categoria || 'Sin categoría'}</div>
-            </div>
-            <div class="gasto-monto">S/ ${Number(g.monto).toFixed(2)}</div>
-          </div>`;
-      }).join('');
-
-  document.getElementById('app').innerHTML = `
-    <div class="header">
-      <div class="header-top">
-        <div class="label">Ciclo Actual</div>
-        <div class="ciclo-actual">${cicloActualTexto}</div>
-        ${selectorCiclos}
-      </div>
-      <div class="total-grande"><span>S/ </span>${total.toFixed(2)}</div>
-      <div class="mitad-row">
-        <div class="mitad-chip">Tu parte (50%): <strong>S/ ${mitad.toFixed(2)}</strong></div>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Por Categoría</div>
-      <div class="cat-grid">${catCards}</div>
-    </div>
-
-    ${cuotasHtml}
-
-    <div class="section">
-      <div class="section-title">Últimos Gastos</div>
-      <div class="gastos-list">${gastosList}</div>
-    </div>
-
-    <button class="btn-reload" onclick="cargar()">↻ Actualizar</button>
-  `;
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-async function cambiarCiclo(cicloInicio) {
-  document.getElementById('app').innerHTML = `
-    <div class="estado">
-      <div class="spinner"></div>
-      <span>Cargando ciclo...</span>
-    </div>`;
-  try {
-    const res = await fetch(API_URL + '?ciclo=' + cicloInicio);
-    const data = await res.json();
-    render(data);
-  } catch(err) {
-    document.getElementById('app').innerHTML = `
-      <div class="estado">
-        <span>⚠️ No se pudo conectar</span>
-        <button class="btn-reload" onclick="cargar()">Reintentar</button>
-      </div>`;
-  }
+.label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 800;
+  flex: 1 1 100%;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-async function cargar() {
-  document.getElementById('app').innerHTML = `
-    <div class="estado">
-      <div class="spinner"></div>
-      <span>Cargando gastos...</span>
-    </div>`;
-  try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
-    render(data);
-  } catch(err) {
-    document.getElementById('app').innerHTML = `
-      <div class="estado">
-        <span>⚠️ No se pudo conectar</span>
-        <span style="font-size:12px">Verifica que la URL esté correcta</span>
-        <button class="btn-reload" onclick="cargar()">Reintentar</button>
-      </div>`;
-  }
+.ciclo-selector {
+  appearance: none;
+  background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%);
+  border: 1px solid rgba(96,165,250,0.18);
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+  background-size: 13px;
+  padding-right: 30px;
+  min-width: 88px;
+  line-height: 1.2;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.28);
 }
 
-cargar();
-</script>
-</body>
-</html>
+.ciclo-actual {
+  display: none;
+}
+
+.ciclo-selector:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255,255,255,0.25);
+  box-shadow: 0 8px 20px rgba(2,6,23,0.35);
+}
+
+.ciclo-selector:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.35);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.ciclo-selector:active {
+  transform: scale(0.98);
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* TOTAL - Mayor énfasis */
+.total-grande {
+  font-size: 44px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1;
+  margin: 0 0 10px;
+  color: #4ade80;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  display: inline-block;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+.total-grande span {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--muted);
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.mitad-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.mitad-chip {
+  background: rgba(96,165,250,0.04);
+  border: 1px solid rgba(96,165,250,0.12);
+  border-radius: 13px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  box-shadow: 0 6px 16px rgba(2,6,23,0.45);
+}
+
+.mitad-chip strong {
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 16px;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Secciones - Mayor espaciado */
+.section {
+  padding: 28px 16px 0;
+}
+
+.section-title {
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 800;
+  margin-bottom: 18px;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  opacity: 0.9;
+}
+
+/* Cards de categoría - Más dinámicas */
+.cat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.cat-card {
+  background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  min-height: 136px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.cat-card:active {
+  transform: scale(0.96);
+}
+
+.cat-card:hover {
+  border-color: rgba(255,255,255,0.25);
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(255,255,255,0.1) 100%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.cat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.cat-card.CASA {
+  border-color: rgba(249, 115, 22, 0.4);
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.08);
+}
+
+.cat-card.CASA:hover {
+  border-color: rgba(249, 115, 22, 0.6);
+  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.12);
+}
+
+.cat-card.CASA::before {
+  background: linear-gradient(135deg, var(--casa) 0%, transparent 100%);
+}
+
+.cat-card.COMIDA {
+  border-color: rgba(234, 179, 8, 0.4);
+  box-shadow: 0 4px 16px rgba(234, 179, 8, 0.08);
+}
+
+.cat-card.COMIDA:hover {
+  border-color: rgba(234, 179, 8, 0.6);
+  box-shadow: 0 8px 24px rgba(234, 179, 8, 0.12);
+}
+
+.cat-card.COMIDA::before {
+  background: linear-gradient(135deg, var(--comida) 0%, transparent 100%);
+}
+
+.cat-card.MOVILIDAD {
+  border-color: rgba(168, 85, 247, 0.4);
+  box-shadow: 0 4px 16px rgba(168, 85, 247, 0.08);
+}
+
+.cat-card.MOVILIDAD:hover {
+  border-color: rgba(168, 85, 247, 0.6);
+  box-shadow: 0 8px 24px rgba(168, 85, 247, 0.12);
+}
+
+.cat-card.MOVILIDAD::before {
+  background: linear-gradient(135deg, var(--movilidad) 0%, transparent 100%);
+}
+
+.cat-card.ANDRE {
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.08);
+}
+
+.cat-card.ANDRE:hover {
+  border-color: rgba(59, 130, 246, 0.6);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.12);
+}
+
+.cat-card.ANDRE::before {
+  background: linear-gradient(135deg, var(--andre) 0%, transparent 100%);
+}
+
+.cat-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.cat-emoji {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.cat-name {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 800;
+  text-align: right;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.cat-content {
+  position: relative;
+  z-index: 1;
+}
+
+/* Montos por categoría usan el color del casillero; nombre y porcentaje en blanco */
+.cat-card .cat-name,
+.cat-card .cat-pct {
+  color: var(--text);
+}
+
+.cat-card.CASA .cat-monto { color: var(--casa); }
+.cat-card.COMIDA .cat-monto { color: var(--comida); }
+.cat-card.MOVILIDAD .cat-monto { color: var(--movilidad); }
+.cat-card.ANDRE .cat-monto { color: var(--andre); }
+
+.cat-monto {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--accent);
+  margin-bottom: 8px;
+  line-height: 1.1;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.cat-monto .sym {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--muted);
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.cat-pct {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Lista de gastos */
+.gastos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: rgba(255,255,255,0.02);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 32px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.gasto-item {
+  display: flex;
+  align-items: center;
+  padding: 14px 14px;
+  gap: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background 0.2s ease;
+}
+
+.gasto-item:last-child {
+  border-bottom: none;
+}
+
+.gasto-item:active {
+  background: rgba(255,255,255,0.05);
+}
+
+.gasto-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.gasto-dot.CASA { background: var(--casa); }
+.gasto-dot.COMIDA { background: var(--comida); }
+.gasto-dot.MOVILIDAD { background: var(--movilidad); }
+.gasto-dot.ANDRE { background: var(--andre); }
+.gasto-dot.default { background: var(--muted); }
+
+.gasto-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.gasto-concepto {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text);
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.gasto-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-weight: 500;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.gasto-monto {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  flex-shrink: 0;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Compras en cuotas - Diferenciadas visualmente */
+.cuotas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  margin-bottom: 32px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+}
+
+.cuota-item {
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background 0.2s ease;
+}
+
+.cuota-item:last-child {
+  border-bottom: none;
+}
+
+.cuota-item:active {
+  background: rgba(255,255,255,0.06);
+}
+
+.cuota-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.cuota-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.cuota-emoji {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.cuota-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cuota-concepto {
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text);
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.cuota-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-weight: 500;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.cuota-monto {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  flex-shrink: 0;
+  text-align: right;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.cuota-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cuota-bar {
+  flex: 1;
+  height: 10px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.cuota-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #34d399 0%, #22c55e 50%, #4ade80 100%);
+  border-radius: inherit;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 14px rgba(74, 222, 128, 0.35);
+  position: relative;
+}
+
+.cuota-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.04) 100%);
+  pointer-events: none;
+}
+
+.cuota-label {
+  font-size: 12px;
+  color: #d1fae5;
+  font-weight: 800;
+  white-space: nowrap;
+  min-width: 45px;
+  text-align: right;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Loading / error */
+.estado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 15px;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(255,255,255,0.1);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.btn-reload {
+  margin: 20px auto 0;
+  display: block;
+  background: linear-gradient(135deg, var(--accent) 0%, #7dd3fc 100%);
+  border: none;
+  color: #041022;
+  padding: 12px 26px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all 0.2s ease;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  box-shadow: 0 8px 24px rgba(96,165,250,0.16);
+}
+
+.btn-reload:active {
+  transform: scale(0.96);
+}
+
+.btn-reload:hover {
+  box-shadow: 0 6px 16px rgba(255, 255, 255, 0.15);
+}
+
+.empty-cat {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 16px;
+  color: var(--muted);
+  font-size: 14px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.empty-list {
+  padding: 40px 16px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
