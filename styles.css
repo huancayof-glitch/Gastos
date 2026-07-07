@@ -1,0 +1,572 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600;700;800&family=SF+Mono:wght@400;500;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg: #0a0d1f;
+  --surface: #141829;
+  --text: #ffffff;
+  --muted: #9ca3af;
+  --accent: #ffffff;
+  
+  --casa: #f97316;
+  --casa-dark: #ea580c;
+  --comida: #eab308;
+  --comida-dark: #ca8a04;
+  --movilidad: #a855f7;
+  --movilidad-dark: #9333ea;
+  --andre: #3b82f6;
+  --andre-dark: #2563eb;
+  
+  --radius: 24px;
+  --radius-sm: 16px;
+}
+
+body {
+  background: #000000;
+  color: var(--text);
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  padding: 0 0 40px 0;
+}
+
+/* Header */
+.header {
+  padding: 16px 20px 24px;
+  position: relative;
+  padding-top: max(16px, env(safe-area-inset-top));
+  background: #000000;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.label {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 800;
+  flex: 1;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.ciclo-selector {
+  appearance: none;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px;
+  padding-right: 40px;
+}
+
+.ciclo-selector:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.25);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.ciclo-selector:active {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* TOTAL - Mayor énfasis */
+.total-grande {
+  font-size: 76px;
+  font-weight: 900;
+  letter-spacing: -2px;
+  line-height: 0.9;
+  margin: 0 0 12px;
+  color: #ffffff;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  text-shadow: 0 0 60px rgba(255, 255, 255, 0.25), 0 0 30px rgba(255, 255, 255, 0.15);
+  padding: 16px 20px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  display: inline-block;
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
+}
+
+.total-grande span {
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--muted);
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.mitad-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.mitad-chip {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 13px;
+  padding: 14px 20px;
+  font-size: 14px;
+  color: var(--muted);
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
+}
+
+.mitad-chip strong {
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 16px;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Secciones - Mayor espaciado */
+.section {
+  padding: 36px 20px 0;
+}
+
+.section-title {
+  font-size: 13px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 800;
+  margin-bottom: 18px;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  opacity: 0.9;
+}
+
+/* Cards de categoría - Más dinámicas */
+.cat-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+.cat-card {
+  background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-sm);
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  min-height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.cat-card:active {
+  transform: scale(0.96);
+}
+
+.cat-card:hover {
+  border-color: rgba(255,255,255,0.25);
+  background: linear-gradient(135deg, var(--surface) 0%, rgba(255,255,255,0.1) 100%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transform: translateY(-2px);
+}
+
+.cat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.cat-card.CASA {
+  border-color: rgba(249, 115, 22, 0.4);
+  box-shadow: 0 4px 16px rgba(249, 115, 22, 0.08);
+}
+
+.cat-card.CASA:hover {
+  border-color: rgba(249, 115, 22, 0.6);
+  box-shadow: 0 8px 24px rgba(249, 115, 22, 0.12);
+}
+
+.cat-card.CASA::before {
+  background: linear-gradient(135deg, var(--casa) 0%, transparent 100%);
+}
+
+.cat-card.COMIDA {
+  border-color: rgba(234, 179, 8, 0.4);
+  box-shadow: 0 4px 16px rgba(234, 179, 8, 0.08);
+}
+
+.cat-card.COMIDA:hover {
+  border-color: rgba(234, 179, 8, 0.6);
+  box-shadow: 0 8px 24px rgba(234, 179, 8, 0.12);
+}
+
+.cat-card.COMIDA::before {
+  background: linear-gradient(135deg, var(--comida) 0%, transparent 100%);
+}
+
+.cat-card.MOVILIDAD {
+  border-color: rgba(168, 85, 247, 0.4);
+  box-shadow: 0 4px 16px rgba(168, 85, 247, 0.08);
+}
+
+.cat-card.MOVILIDAD:hover {
+  border-color: rgba(168, 85, 247, 0.6);
+  box-shadow: 0 8px 24px rgba(168, 85, 247, 0.12);
+}
+
+.cat-card.MOVILIDAD::before {
+  background: linear-gradient(135deg, var(--movilidad) 0%, transparent 100%);
+}
+
+.cat-card.ANDRE {
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.08);
+}
+
+.cat-card.ANDRE:hover {
+  border-color: rgba(59, 130, 246, 0.6);
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.12);
+}
+
+.cat-card.ANDRE::before {
+  background: linear-gradient(135deg, var(--andre) 0%, transparent 100%);
+}
+
+.cat-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.cat-emoji {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.cat-name {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 800;
+  text-align: right;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.cat-content {
+  position: relative;
+  z-index: 1;
+}
+
+.cat-monto {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  margin-bottom: 8px;
+  line-height: 1.1;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.cat-monto .sym {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--muted);
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.cat-pct {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Lista de gastos */
+.gastos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: rgba(255,255,255,0.02);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 32px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.gasto-item {
+  display: flex;
+  align-items: center;
+  padding: 16px 18px;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background 0.2s ease;
+}
+
+.gasto-item:last-child {
+  border-bottom: none;
+}
+
+.gasto-item:active {
+  background: rgba(255,255,255,0.05);
+}
+
+.gasto-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.gasto-dot.CASA { background: var(--casa); }
+.gasto-dot.COMIDA { background: var(--comida); }
+.gasto-dot.MOVILIDAD { background: var(--movilidad); }
+.gasto-dot.ANDRE { background: var(--andre); }
+.gasto-dot.default { background: var(--muted); }
+
+.gasto-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.gasto-concepto {
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text);
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.gasto-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-weight: 500;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.gasto-monto {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  flex-shrink: 0;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Compras en cuotas - Diferenciadas visualmente */
+.cuotas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  margin-bottom: 32px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.05);
+}
+
+.cuota-item {
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  gap: 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: background 0.2s ease;
+}
+
+.cuota-item:last-child {
+  border-bottom: none;
+}
+
+.cuota-item:active {
+  background: rgba(255,255,255,0.06);
+}
+
+.cuota-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.cuota-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+}
+
+.cuota-emoji {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.cuota-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.cuota-concepto {
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text);
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.cuota-meta {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+  font-weight: 500;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.cuota-monto {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  flex-shrink: 0;
+  text-align: right;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.cuota-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cuota-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.cuota-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffffff 0%, #e5e5e5 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+}
+
+.cuota-label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 800;
+  white-space: nowrap;
+  min-width: 45px;
+  text-align: right;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Loading / error */
+.estado {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 15px;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(255,255,255,0.1);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.btn-reload {
+  margin: 24px auto 0;
+  display: block;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+  border: none;
+  color: #000000;
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  transition: all 0.2s ease;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+.btn-reload:active {
+  transform: scale(0.96);
+}
+
+.btn-reload:hover {
+  box-shadow: 0 6px 16px rgba(255, 255, 255, 0.15);
+}
+
+.empty-cat {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--muted);
+  font-size: 15px;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.empty-list {
+  padding: 48px 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 15px;
+  font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
