@@ -47,17 +47,10 @@ function formatearFechaCorta(fecha) {
 
 function render(data) {
   const { ciclo, ciclosDisponibles, total, mitad, por_categoria, gastos } = data;
-  const totalMax = Math.max(...Object.values(por_categoria), 1);
 
   // Filtrar gastos normales y cuotas
   const gastosNormales = gastos.filter(g => !g.es_cuota);
   const gastosConCuota = gastos.filter(g => g.es_cuota);
-  const categoriasEntradas = Object.entries(por_categoria || {});
-  const categoriaMasAlta = categoriasEntradas.length > 0
-    ? categoriasEntradas.reduce((mayor, actual) => actual[1] > mayor[1] ? actual : mayor, categoriasEntradas[0])
-    : null;
-  const categoriaTopName = categoriaMasAlta ? categoriaMasAlta[0] : '—';
-  const categoriaTopMonto = categoriaMasAlta ? categoriaMasAlta[1] : 0;
 
   // Selector de ciclos
   const cicloActualTexto = formatearFechaCorta(ciclo?.inicio) && formatearFechaCorta(ciclo?.cierre)
@@ -153,20 +146,6 @@ function render(data) {
       <div class="total-grande"><span>S/ </span>${total.toFixed(2)}</div>
       <div class="mitad-row">
         <div class="mitad-chip">Tu parte (50%): <strong>S/ ${mitad.toFixed(2)}</strong></div>
-      </div>
-      <div class="summary-strip">
-        <div class="summary-item">
-          <span class="summary-label">Gastos</span>
-          <strong>${gastos.length}</strong>
-        </div>
-        <div class="summary-item">
-          <span class="summary-label">Categoría mayor</span>
-          <strong>${categoriaTopName}</strong>
-        </div>
-        <div class="summary-item">
-          <span class="summary-label">Top</span>
-          <strong>S/ ${categoriaTopMonto.toFixed(2)}</strong>
-        </div>
       </div>
     </div>
 
