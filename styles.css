@@ -27,75 +27,91 @@ body {
   color: var(--text);
   font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   min-height: 100vh;
-  padding: 0 0 40px 0;
+  padding: 0 0 32px 0;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Header */
 .header {
-  padding: 16px 20px 24px;
+  padding: 16px 16px 24px;
   position: relative;
   padding-top: max(16px, env(safe-area-inset-top));
-  background: #000000;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  background: #070a12;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
 }
 
 .header-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  gap: 12px;
+  margin-bottom: 16px;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .label {
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted);
   font-weight: 800;
-  flex: 1;
+  flex: 1 1 100%;
   font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
 .ciclo-selector {
   appearance: none;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(96,165,250,0.12);
+  background: linear-gradient(135deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.03) 100%);
+  border: 1px solid rgba(96,165,250,0.18);
   color: var(--text);
-  padding: 12px 16px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
   flex-shrink: 0;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-appearance: none;
   -moz-appearance: none;
   background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
   background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 18px;
-  padding-right: 40px;
+  background-position: right 9px center;
+  background-size: 13px;
+  padding-right: 30px;
+  min-width: 88px;
+  line-height: 1.2;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.28);
+}
+
+.ciclo-actual {
+  display: none;
+}
+
+.ciclo-selector:hover {
+  transform: translateY(-1px);
+  border-color: rgba(255,255,255,0.25);
+  box-shadow: 0 8px 20px rgba(2,6,23,0.35);
 }
 
 .ciclo-selector:focus {
   outline: none;
-  border-color: rgba(255, 255, 255, 0.25);
-  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.35);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .ciclo-selector:active {
-  background-color: rgba(255, 255, 255, 0.1);
+  transform: scale(0.98);
+  background-color: rgba(255, 255, 255, 0.12);
 }
 
 /* TOTAL - Mayor énfasis */
 .total-grande {
-  font-size: 48px;
+  font-size: 44px;
   font-weight: 800;
   letter-spacing: -1px;
   line-height: 1;
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   color: #4ade80;
   font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   padding: 0;
@@ -117,15 +133,15 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-top: 16px;
+  margin-top: 12px;
 }
 
 .mitad-chip {
   background: rgba(96,165,250,0.04);
   border: 1px solid rgba(96,165,250,0.12);
   border-radius: 13px;
-  padding: 14px 20px;
-  font-size: 14px;
+  padding: 12px 16px;
+  font-size: 13px;
   color: var(--muted);
   font-weight: 600;
   backdrop-filter: blur(10px);
@@ -142,7 +158,7 @@ body {
 
 /* Secciones - Mayor espaciado */
 .section {
-  padding: 36px 20px 0;
+  padding: 28px 16px 0;
 }
 
 .section-title {
@@ -160,19 +176,19 @@ body {
 .cat-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-bottom: 32px;
+  gap: 12px;
+  margin-bottom: 24px;
 }
 
 .cat-card {
   background: linear-gradient(135deg, var(--bg) 0%, var(--surface) 100%);
   border: 1.5px solid rgba(255,255,255,0.12);
   border-radius: var(--radius-sm);
-  padding: 18px;
+  padding: 14px;
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
-  min-height: 150px;
+  min-height: 136px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -338,8 +354,8 @@ body {
 .gasto-item {
   display: flex;
   align-items: center;
-  padding: 16px 18px;
-  gap: 12px;
+  padding: 14px 14px;
+  gap: 10px;
   border-bottom: 1px solid rgba(255,255,255,0.05);
   transition: background 0.2s ease;
 }
@@ -371,7 +387,7 @@ body {
 }
 
 .gasto-concepto {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -389,7 +405,7 @@ body {
 }
 
 .gasto-monto {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   color: #ffffff;
   flex-shrink: 0;
@@ -413,8 +429,8 @@ body {
 .cuota-item {
   display: flex;
   flex-direction: column;
-  padding: 18px;
-  gap: 14px;
+  padding: 14px;
+  gap: 12px;
   border-bottom: 1px solid rgba(255,255,255,0.05);
   transition: background 0.2s ease;
 }
@@ -471,7 +487,7 @@ body {
 }
 
 .cuota-monto {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text);
   flex-shrink: 0;
@@ -549,20 +565,20 @@ body {
 }
 
 .btn-reload {
-  margin: 24px auto 0;
+  margin: 20px auto 0;
   display: block;
   background: linear-gradient(135deg, var(--accent) 0%, #7dd3fc 100%);
   border: none;
   color: #041022;
-  padding: 14px 32px;
-  border-radius: 12px;
-  font-size: 14px;
+  padding: 12px 26px;
+  border-radius: 999px;
+  font-size: 13px;
   font-weight: 800;
   cursor: pointer;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   transition: all 0.2s ease;
   font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  box-shadow: 0 8px 30px rgba(96,165,250,0.12);
+  box-shadow: 0 8px 24px rgba(96,165,250,0.16);
 }
 
 .btn-reload:active {
@@ -576,9 +592,9 @@ body {
 .empty-cat {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 48px 20px;
+  padding: 40px 16px;
   color: var(--muted);
-  font-size: 15px;
+  font-size: 14px;
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(255,255,255,0.1);
   border-radius: var(--radius-sm);
@@ -586,9 +602,9 @@ body {
 }
 
 .empty-list {
-  padding: 48px 20px;
+  padding: 40px 16px;
   text-align: center;
   color: var(--muted);
-  font-size: 15px;
+  font-size: 14px;
   font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
