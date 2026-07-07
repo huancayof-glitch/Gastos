@@ -35,6 +35,16 @@ function colorDot(cat) {
   return valid.includes(cat) ? cat : 'default';
 }
 
+function formatearFechaCorta(fecha) {
+  if (!fecha) return '';
+  const texto = String(fecha);
+  const match = texto.match(/(\d{4})-(\d{2})-(\d{2})/);
+  if (match) {
+    return `${match[3]}/${match[2]}/${match[1].slice(-2)}`;
+  }
+  return texto;
+}
+
 function render(data) {
   const { ciclo, ciclosDisponibles, total, mitad, por_categoria, gastos } = data;
   const totalMax = Math.max(...Object.values(por_categoria), 1);
@@ -44,11 +54,15 @@ function render(data) {
   const gastosConCuota = gastos.filter(g => g.es_cuota);
 
   // Selector de ciclos
+  const cicloActualTexto = formatearFechaCorta(ciclo?.inicio) && formatearFechaCorta(ciclo?.cierre)
+    ? `${formatearFechaCorta(ciclo.inicio)} → ${formatearFechaCorta(ciclo.cierre)}`
+    : '';
+
   const selectorCiclos = ciclosDisponibles.length === 0
     ? ''
     : `<select class="ciclo-selector" onchange="cambiarCiclo(this.value)">
         ${ciclosDisponibles.map(c => 
-          `<option value="${c.inicio}">${c.inicio} → ${c.cierre}</option>`
+          `<option value="${c.inicio}" ${c.inicio === ciclo?.inicio ? 'selected' : ''}>${formatearFechaCorta(c.inicio)} → ${formatearFechaCorta(c.cierre)}</option>`
         ).join('')}
       </select>`;
 
@@ -127,6 +141,7 @@ function render(data) {
     <div class="header">
       <div class="header-top">
         <div class="label">Ciclo Actual</div>
+        <div class="ciclo-actual">${cicloActualTexto}</div>
         ${selectorCiclos}
       </div>
       <div class="total-grande"><span>S/ </span>${total.toFixed(2)}</div>
