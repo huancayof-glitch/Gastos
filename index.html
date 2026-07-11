@@ -20,6 +20,8 @@
 </div>
 
 <script>
+let ciclosConocidos = [];
+
 function getEmojiPorCategoria(cat) {
   const emojis = {
     'CASA': '🏠',
@@ -45,6 +47,85 @@ function formatearFechaCorta(fecha) {
   return texto;
 }
 
+function normalizarCiclo(ciclo) {
+  if (!ciclo) return { inicio: '', cierre: '' };
+  if (typeof ciclo === 'string') return { inicio: ciclo, cierre: '' };
+  if (Array.isArray(ciclo)) return { inicio: ciclo[0] || '', cierre: ciclo[1] || '' };
+  if (typeof ciclo === 'object') {
+    const inicio = ciclo.inicio || ciclo.start || ciclo.fecha_inicio || ciclo.fechaInicio || '';
+    const cierre = ciclo.cierre || ciclo.end || ciclo.fecha_cierre || ciclo.fechaCierre || '';
+    return { inicio: inicio ? String(inicio) : '', cierre: cierre ? String(cierre) : '' };
+  }
+  return { inicio: '', cierre: '' };
+}
+
+function formatearFechaParaInput(fecha) {
+  const date = new Date(fecha);
+  if (Number.isNaN(date.getTime())) return '';
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function obtenerCiclosDisponibles(payload, cicloActual, ciclosPrevios = []) {
+  const candidatos = [
+    payload.ciclosDisponibles,
+    payload.ciclos_disponibles,
+    payload.ciclos,
+    payload.periodos,
+    payload.historial
+  ];
+  const ciclos = [];
+  const vistos = new Set();
+
+  const agregarCiclo = (ciclo) => {
+    const dato = normalizarCiclo(ciclo);
+    if (!dato.inicio) return;
+    const clave = `${dato.inicio}|${dato.cierre || ''}`;
+    if (vistos.has(clave)) return;
+    vistos.add(clave);
+    ciclos.push(dato);
+  };
+
+  ciclosPrevios.forEach(agregarCiclo);
+
+  candidatos.forEach(lista => {
+    if (!Array.isArray(lista)) return;
+    lista.forEach(agregarCiclo);
+  });
+
+  const actual = normalizarCiclo(cicloActual);
+  if (actual.inicio) {
+    const claveActual = `${actual.inicio}|${actual.cierre || ''}`;
+    if (!vistos.has(claveActual)) {
+      ciclos.unshift(actual);
+      vistos.add(claveActual);
+    }
+  }
+
+  if (ciclos.length === 0 && actual.inicio) {
+    const inicioActual = new Date(actual.inicio);
+    const cierreActual = actual.cierre ? new Date(actual.cierre) : new Date(inicioActual);
+    const duracionDias = Math.max(1, Math.round((cierreActual - inicioActual) / 86400000) + 1);
+
+    for (let i = 0; i < 6; i += 1) {
+      const inicio = new Date(inicioActual.getFullYear(), inicioActual.getMonth() - i, inicioActual.getDate());
+      const cierre = new Date(inicio.getFullYear(), inicio.getMonth(), inicio.getDate() + duracionDias - 1);
+      const cicloFallback = {
+        inicio: formatearFechaParaInput(inicio),
+        cierre: formatearFechaParaInput(cierre)
+      };
+      const clave = `${cicloFallback.inicio}|${cicloFallback.cierre}`;
+      if (vistos.has(clave)) continue;
+      vistos.add(clave);
+      ciclos.push(cicloFallback);
+    }
+  }
+
+  return ciclos;
+}
+
 function mostrarEstado(mensaje, submensaje = '', mostrarSpinner = false, mostrarBoton = true) {
   const app = document.getElementById('app');
   if (!app) return;
@@ -59,8 +140,9 @@ function mostrarEstado(mensaje, submensaje = '', mostrarSpinner = false, mostrar
 
 function render(data) {
   const payload = data && typeof data === 'object' ? data : {};
-  const ciclo = payload.ciclo && typeof payload.ciclo === 'object' ? payload.ciclo : {};
-  const ciclosDisponibles = Array.isArray(payload.ciclosDisponibles) ? payload.ciclosDisponibles : [];
+  const ciclo = normalizarCiclo(payload.ciclo);
+  const ciclosDisponibles = obtenerCiclosDisponibles(payload, ciclo, ciclosConocidos);
+  ciclosConocidos = ciclosDisponibles;
   const total = Number(payload.total) || 0;
   const mitad = Number(payload.mitad) || 0;
   const porCategoria = payload.por_categoria && typeof payload.por_categoria === 'object' ? payload.por_categoria : {};
@@ -73,7 +155,7 @@ function render(data) {
     ? `${formatearFechaCorta(ciclo.inicio)} → ${formatearFechaCorta(ciclo.cierre)}`
     : '';
 
-  const selectorCiclos = ciclosDisponibles.length === 0
+  const selectorCiclos = ciclosDisponibles.length <= 1
     ? ''
     : `<select class="ciclo-selector" onchange="cambiarCiclo(this.value)">
         ${ciclosDisponibles.map(c => 
@@ -152,7 +234,7 @@ function render(data) {
   document.getElementById('app').innerHTML = `
     <div class="header">
       <div class="header-top">
-        <div class="label">Ciclo Actual</div>
+        <div class="label">Ciclo</div>
         <div class="ciclo-actual">${cicloActualTexto}</div>
         ${selectorCiclos}
       </div>
