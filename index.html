@@ -21,15 +21,19 @@
 
 <script>
 let ciclosConocidos = [];
+let datosActuales = null;
+let filtroCategoriaActual = null;
 
 function getEmojiPorCategoria(cat) {
-  const emojis = {
-    'CASA': '🏠',
-    'COMIDA': '🍽️',
-    'MOVILIDAD': '🚕',
-    'ANDRE': '🛍️'
+  const imagenes = {
+    'CASA': './imagenes/casa.png',
+    'COMIDA': './imagenes/comida.png',
+    'MOVILIDAD': './imagenes/movilidad.png',
+    'ANDRE': './imagenes/andre.png'
   };
-  return emojis[cat] || '📌';
+
+  const src = imagenes[cat];
+  return src ? `<img src="${src}" alt="${cat}" />` : '📌';
 }
 
 function colorDot(cat) {
@@ -138,7 +142,53 @@ function mostrarEstado(mensaje, submensaje = '', mostrarSpinner = false, mostrar
     </div>`;
 }
 
+function normalizarCategoria(cat) {
+  return String(cat || '').trim().toUpperCase();
+}
+
+function parsearFecha(fecha) {
+  if (!fecha) return 0;
+
+  const texto = String(fecha).trim();
+  if (!texto) return 0;
+
+  const isoMatch = texto.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T\s](\d{2}):(\d{2})(?::(\d{2}))?)?/);
+  if (isoMatch) {
+    const [, anio, mes, dia, hora = '00', minuto = '00', segundo = '00'] = isoMatch;
+    return Date.UTC(Number(anio), Number(mes) - 1, Number(dia), Number(hora), Number(minuto), Number(segundo));
+  }
+
+  const slashMatch = texto.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?(?:[T\s](\d{2}):(\d{2})(?::(\d{2}))?)?/);
+  if (slashMatch) {
+    const [, dia, mes, anio, hora = '00', minuto = '00', segundo = '00'] = slashMatch;
+    const anioCompleto = anio
+      ? (anio.length === 2 ? 2000 + Number(anio) : Number(anio))
+      : new Date().getFullYear();
+    return Date.UTC(anioCompleto, Number(mes) - 1, Number(dia), Number(hora), Number(minuto), Number(segundo));
+  }
+
+  const fechaDate = new Date(texto);
+  return Number.isNaN(fechaDate.getTime()) ? 0 : fechaDate.getTime();
+}
+
+function ordenarGastosPorFecha(gastos) {
+  return [...gastos].sort((a, b) => {
+    const timeA = parsearFecha(a.fecha);
+    const timeB = parsearFecha(b.fecha);
+    return timeB - timeA;
+  });
+}
+
+function toggleFiltroCategoria(categoria) {
+  const cat = normalizarCategoria(categoria);
+  filtroCategoriaActual = filtroCategoriaActual === cat ? null : cat;
+  if (datosActuales) {
+    render(datosActuales);
+  }
+}
+
 function render(data) {
+  datosActuales = data;
   const payload = data && typeof data === 'object' ? data : {};
   const ciclo = normalizarCiclo(payload.ciclo);
   const ciclosDisponibles = obtenerCiclosDisponibles(payload, ciclo, ciclosConocidos);
@@ -148,8 +198,11 @@ function render(data) {
   const porCategoria = payload.por_categoria && typeof payload.por_categoria === 'object' ? payload.por_categoria : {};
   const gastos = Array.isArray(payload.gastos) ? payload.gastos : [];
 
-  const gastosNormales = gastos.filter(g => !g.es_cuota);
+  const gastosNormales = ordenarGastosPorFecha(gastos.filter(g => !g.es_cuota));
   const gastosConCuota = gastos.filter(g => g.es_cuota);
+  const gastosVisibles = filtroCategoriaActual
+    ? gastosNormales.filter(g => normalizarCategoria(g.categoria) === filtroCategoriaActual)
+    : gastosNormales.slice(0, 5);
 
   const cicloActualTexto = formatearFechaCorta(ciclo.inicio) && formatearFechaCorta(ciclo.cierre)
     ? `${formatearFechaCorta(ciclo.inicio)} → ${formatearFechaCorta(ciclo.cierre)}`
@@ -171,8 +224,10 @@ function render(data) {
           const pct = total > 0 ? Math.round((monto / total) * 100) : 0;
           const cls = colorDot(cat);
           const emoji = getEmojiPorCategoria(cat);
+          const categoriaNormalizada = normalizarCategoria(cat);
+          const isActive = filtroCategoriaActual === categoriaNormalizada;
           return `
-            <div class="cat-card ${cls}">
+            <div class="cat-card ${cls}${isActive ? ' active' : ''}" onclick="toggleFiltroCategoria('${cat}')">
               <div class="cat-header">
                 <div class="cat-emoji">${emoji}</div>
                 <div class="cat-name">${cat}</div>
@@ -192,12 +247,10 @@ function render(data) {
       <div class="cuotas-list">
         ${gastosConCuota.map(c => {
           const porcentajeProgress = Number(c.cuota_total) > 0 ? (Number(c.cuota_actual) / Number(c.cuota_total)) * 100 : 0;
-          const emoji = getEmojiPorCategoria(c.categoria);
           return `
             <div class="cuota-item">
               <div class="cuota-header">
                 <div class="cuota-left">
-                  <div class="cuota-emoji">${emoji}</div>
                   <div class="cuota-info">
                     <div class="cuota-concepto">${c.concepto || '—'}</div>
                     <div class="cuota-meta">${c.fecha} · ${c.categoria || 'Sin categoría'}</div>
@@ -216,9 +269,9 @@ function render(data) {
       </div>
     </div>`;
 
-  const gastosList = gastosNormales.length === 0
+  const gastosList = gastosVisibles.length === 0
     ? `<div class="empty-list">📭 No hay gastos normales en este ciclo</div>`
-    : gastosNormales.map(g => {
+    : gastosVisibles.map(g => {
         const cls = colorDot(g.categoria);
         return `
           <div class="gasto-item">
@@ -232,7 +285,8 @@ function render(data) {
       }).join('');
 
   document.getElementById('app').innerHTML = `
-    <div class="header">
+    <div class="app-shell">
+      <div class="header">
       <div class="header-top">
         <div class="label">Ciclo</div>
         <div class="ciclo-actual">${cicloActualTexto}</div>
@@ -257,10 +311,12 @@ function render(data) {
     </div>
 
     <button class="btn-reload" onclick="cargar()">↻ Actualizar</button>
+    </div>
   `;
 }
 
 async function cambiarCiclo(cicloInicio) {
+  filtroCategoriaActual = null;
   mostrarEstado('Cargando ciclo...', '', true, false);
   try {
     const res = await fetch(`${API_URL}?ciclo=${encodeURIComponent(cicloInicio)}`, { cache: 'no-store' });
@@ -273,6 +329,7 @@ async function cambiarCiclo(cicloInicio) {
 }
 
 async function cargar() {
+  filtroCategoriaActual = null;
   mostrarEstado('Cargando gastos...', '', true, false);
   try {
     const res = await fetch(API_URL, { cache: 'no-store' });
